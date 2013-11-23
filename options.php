@@ -1,13 +1,14 @@
 <div class="wrap">
     <h2>Allowed Hosts</h2>
     <form method="post" action="options.php">
-        <?php settings_fields('vdp-settings-group'); ?>
+        <?php settings_fields('ah-settings-group'); ?>
         <table class="form-table">
             <tr valign="top">
                 <th scope="row">Hosts</th>
                 <td>
-                    <textarea name="varnish-nodes"><?php echo get_option('allowed-domains'); ?></textarea>
-                    <p>Enter domain names that this WordPress instance needs to communicate with. Regular expressions can be used. Separate multiple domains by commas.</p>
+                    <textarea name="allowed-hosts"><?php echo get_option('allowed-hosts'); ?></textarea>
+                    <input type="checkbox" name="allowed-hosts-regex" id="allowed-hosts-regex" value="<?php echo get_option('allowed-hosts'); ?>" /> <label for="allowed-hosts-regex">Compare hosts using regular expressions</label>
+                    <p>Enter domain names that this WordPress instance needs to communicate with. Separate multiple domains by commas. For information about regular expressions please go to <a href="http://www.regular-expressions.info">http://www.regular-expressions.info</a>.</p>
                 </td>
             </tr>
         </table>

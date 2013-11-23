@@ -18,9 +18,17 @@ class AH {
         $allowed_hosts = get_option('allowed-hosts');
         if (!empty($allowed_hosts)) {
             foreach (explode(',', $allowed_hosts) as $allowed_host) {
-                if (preg_match($allowed_host, $host)) {
-                    $is_allowed = true;
-                    break;
+
+                if(get_option('allowed-hosts-regex')) {
+                    if (preg_match($allowed_host, $host)) {
+                        $is_allowed = true;
+                        break;
+                    }
+                } else {
+                    if (strcmp($allowed_host, $host) == 0) {
+                        $is_allowed = true;
+                        break;
+                    }
                 }
             }
         }
@@ -50,6 +58,7 @@ class AHSettings {
 
     public function register_settings() {
         register_setting('ah-settings-group', 'allowed-hosts');
+        register_setting('ah-settings-group', 'allowed-hosts-regex');
     }
 
 }
