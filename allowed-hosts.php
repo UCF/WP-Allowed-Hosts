@@ -9,7 +9,7 @@ License: GPL3
 
 class AH {
     public function __construct() {
-        add_filter('http_request_host_is_external', 'my_http_request_host_is_external', 10, 2);
+        add_filter('http_request_host_is_external', array($this, 'http_external_host_allowed'), 10, 2);
             add_action('admin_menu', create_function('', 'new AHSettings();'));
         }
     }
@@ -28,7 +28,6 @@ class AH {
 
         return $is_allowed;
     }
-
 }
 
 class AHSettings {
