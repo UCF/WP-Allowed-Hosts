@@ -19,7 +19,7 @@ class AH {
         if (!empty($allowed_hosts)) {
             foreach (explode(',', $allowed_hosts) as $allowed_host) {
                 if(get_option('allowed-hosts-regex')) {
-                    if (preg_match('/' . $allowed_host, $host . '/')) {
+                    if (preg_match('/' . $allowed_host . '/', $host)) {
                         $is_allowed = true;
                         break;
                     }
