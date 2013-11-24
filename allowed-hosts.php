@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP Allowed Hosts
 Description: Allow WordPress to communicate with other domains.
-Version: 0.0.1
+Version: 1.0.0
 Author: Brandon Groves
 License: GPL3
 */
