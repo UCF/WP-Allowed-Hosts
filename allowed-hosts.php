@@ -54,18 +54,30 @@ class AHSettings {
     public
         $page_title = 'Allowed Hosts',
         $menu_title = 'Allowed Hosts',
-        $capability = 'administrator',
+        $capability = 'manage_options',
         $menu_slug  = 'ah-settings-page',
         $file_name  = 'options.php';
 
     public function __construct() {
-        add_options_page(
-            $this->page_title,
-            $this->menu_title,
-            $this->capability,
-            $this->menu_slug,
-            create_function('', 'include(plugin_dir_path(__FILE__).\''.$this->file_name.'\');')
-        );
+        if (is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ))) {
+            add_submenu_page(
+                'settings.php',
+                $this->page_title,
+                $this->menu_title,
+                $this->capability,
+                $this->menu_slug,
+                create_function('', 'include(plugin_dir_path(__FILE__).\''.$this->file_name.'\');')
+            );
+        } else {
+            add_options_page(
+                $this->page_title,
+                $this->menu_title,
+                $this->capability,
+                $this->menu_slug,
+                create_function('', 'include(plugin_dir_path(__FILE__).\''.$this->file_name.'\');')
+            );
+        }
+
         add_action('admin_init', array($this, 'register_settings'));
     }
 
