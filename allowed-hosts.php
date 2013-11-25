@@ -115,11 +115,13 @@ class AHSettings {
         }
 
         if (isset($_POST['_wpnonce']) && isset($_POST['submit'])) {
+            // Remove slashes added by PHP or by WordPress
+            $allowed_hosts = (!get_magic_quotes_gpc() && !function_exists('wp_magic_quotes')) ? $_POST['allowed-hosts'] : stripslashes($_POST['allowed-hosts']);
             if (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) {
-                update_site_option(AH::$ALLOWED_HOSTS_NAME, $_POST['allowed-hosts']);
+                update_site_option(AH::$ALLOWED_HOSTS_NAME, $allowed_hosts);
                 update_site_option(AH::$ALLOWED_HOSTS_REGEX_NAME, (int)$_POST['allowed-hosts-regex']);
             } else {
-                update_option(AH::$ALLOWED_HOSTS_NAME, $_POST['allowed-hosts']);
+                update_option(AH::$ALLOWED_HOSTS_NAME, $allowed_hosts);
                 update_option(AH::$ALLOWED_HOSTS_REGEX_NAME, (int)$_POST['allowed-hosts-regex']);
             }
         }
@@ -141,7 +143,7 @@ class AHSettings {
                         <th scope='row'>Hosts</th>
                         <td>
                             <textarea name='allowed-hosts'>", ((is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) ? get_site_option('allowed-hosts') : get_option('allowed-hosts')), "</textarea>
-                            <br />
+                            br />
                             <input type='checkbox' name='allowed-hosts-regex' id='allowed-hosts-regex' value='1'", (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) ? checked(get_site_option('allowed-hosts-regex')) : checked(get_option('allowed-hosts-regex')), "/> <label for='allowed-hosts-regex'>Compare hosts using regular expressions</label>
                             <p>Enter domain names that this WordPress instance needs to communicate with. Separate multiple domains by commas. Delimiters are not needed for regular expressions since they are put in for you ('/'). For information about regular expressions please go to <a href='http://www.regular-expressions.info'>http://www.regular-expressions.info</a>.</p>
                         </td>
