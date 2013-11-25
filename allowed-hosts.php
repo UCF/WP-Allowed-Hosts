@@ -10,16 +10,29 @@ License: GPL3
 class AH {
     public function __construct() {
         add_filter('http_request_host_is_external', array($this, 'http_external_host_allowed'), 10, 2);
-        add_action('admin_menu', create_function('', 'new AHSettings();'));
+
+        $hook = (is_multisite() && isset($_GET['networkwide']) && 1 == $_GET['networkwide']) ? 'network_' : '';
+        add_action('{$hook}admin_menu', create_function('', 'new AHSettings();'));
     }
 
     function http_external_host_allowed($is_external, $host) {
+
+        // Get site option if network activated
+        $allowed_hosts = '';
+        $allowed_hosts_regex = '';
+        if (is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ))) {
+            $allowed_hosts = get_site_option('allowed-hosts');
+            $allowed_hosts_regex = get_site_option('allowed-hosts-regex');
+        } else {
+            $allowed_hosts = get_option('allowed-hosts');
+            $allowed_hosts_regex = get_option('allowed-hosts-regex');
+        }
+
         $is_allowed = false;
-        $allowed_hosts = get_option('allowed-hosts');
         if (!empty($allowed_hosts)) {
             foreach (explode(',', $allowed_hosts) as $allowed_host) {
                 $allowed_host = trim($allowed_host);
-                if(get_option('allowed-hosts-regex')) {
+                if($allowed_hosts_regex) {
                     if (preg_match('/' . $allowed_host . '/', $host)) {
                         $is_allowed = true;
                         break;
