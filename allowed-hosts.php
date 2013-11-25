@@ -8,19 +8,47 @@ License: GPL3
 */
 
 class AH {
+
+    public static $ALLOWED_HOSTS_NAME = 'allowed-hosts';
+    public static $ALLOWED_HOSTS_REGEX_NAME = 'allowed-hosts-regex';
+
+    static public function activate() {
+        if (is_multisite() && isset($_GET['networkwide']) && 1 == $_GET['networkwide']) {
+            add_site_option(AH::$ALLOWED_HOSTS_NAME, '');
+            add_site_option(AH::$ALLOWED_HOSTS_REGEX_NAME, 0);
+        } else {
+            delete_option(AH::$ALLOWED_HOSTS_NAME, '');
+            delete_option(AH::$ALLOWED_HOSTS_REGEX_NAME, 0);
+        }
+    }
+
+    static public function deactivate() {
+        if (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) {
+            delete_site_option(AH::$ALLOWED_HOSTS_NAME);
+            delete_site_option(AH::$ALLOWED_HOSTS_REGEX_NAME);
+        } else {
+            delete_option(AH::$ALLOWED_HOSTS_NAME);
+            delete_option(AH::$ALLOWED_HOSTS_REGEX_NAME);
+        }
+    }
+
     public function __construct() {
         add_filter('http_request_host_is_external', array($this, 'http_external_host_allowed'), 10, 2);
 
-        $hook = (is_multisite() && isset($_GET['networkwide']) && 1 == $_GET['networkwide']) ? 'network_' : '';
-        add_action('{$hook}admin_menu', create_function('', 'new AHSettings();'));
+        // Makes sure the plugin is defined before trying to use it
+        if (!function_exists( 'is_plugin_active_for_network')) {
+            require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+        }
+
+        $hook = (is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ))) ? 'network_' : '';
+        add_action("{$hook}admin_menu", create_function('', 'new AHSettings();'));
     }
 
     function http_external_host_allowed($is_external, $host) {
-
         // Get site option if network activated
         $allowed_hosts = '';
         $allowed_hosts_regex = '';
-        if (is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ))) {
+        if (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) {
             $allowed_hosts = get_site_option('allowed-hosts');
             $allowed_hosts_regex = get_site_option('allowed-hosts-regex');
         } else {
@@ -32,7 +60,7 @@ class AH {
         if (!empty($allowed_hosts)) {
             foreach (explode(',', $allowed_hosts) as $allowed_host) {
                 $allowed_host = trim($allowed_host);
-                if($allowed_hosts_regex) {
+                if ($allowed_hosts_regex) {
                     if (preg_match('/' . $allowed_host . '/', $host)) {
                         $is_allowed = true;
                         break;
@@ -59,14 +87,14 @@ class AHSettings {
         $file_name  = 'options.php';
 
     public function __construct() {
-        if (is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ))) {
+        if (is_multisite() && is_plugin_active_for_network(plugin_basename( __FILE__ ))) {
             add_submenu_page(
                 'settings.php',
                 $this->page_title,
                 $this->menu_title,
                 $this->capability,
                 $this->menu_slug,
-                create_function('', 'include(plugin_dir_path(__FILE__).\''.$this->file_name.'\');')
+                array($this, 'settings_page')
             );
         } else {
             add_options_page(
@@ -74,11 +102,53 @@ class AHSettings {
                 $this->menu_title,
                 $this->capability,
                 $this->menu_slug,
-                create_function('', 'include(plugin_dir_path(__FILE__).\''.$this->file_name.'\');')
+                array($this, 'settings_page')
             );
         }
 
         add_action('admin_init', array($this, 'register_settings'));
+    }
+
+    public function settings_page() {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to access this page.'));
+        }
+
+        if (isset($_POST['_wpnonce']) && isset($_POST['submit'])) {
+            if (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) {
+                update_site_option(AH::$ALLOWED_HOSTS_NAME, $_POST['allowed-hosts']);
+                update_site_option(AH::$ALLOWED_HOSTS_REGEX_NAME, (int)$_POST['allowed-hosts-regex']);
+            } else {
+                update_option(AH::$ALLOWED_HOSTS_NAME, $_POST['allowed-hosts']);
+                update_option(AH::$ALLOWED_HOSTS_REGEX_NAME, (int)$_POST['allowed-hosts-regex']);
+            }
+        }
+
+        $this->display_options_page();
+    }
+
+    public function display_options_page() {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to access this page.'));
+        }
+
+        echo "<div class='wrap'>
+            <h2>Allowed Hosts</h2>
+            <form method='post'>";
+        settings_fields('ah-settings-group');
+        echo "<table class='form-table'>
+                    <tr valign='top'>
+                        <th scope='row'>Hosts</th>
+                        <td>
+                            <textarea name='allowed-hosts'>", ((is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) ? get_site_option('allowed-hosts') : get_option('allowed-hosts')), "</textarea>
+                            <br />
+                            <input type='checkbox' name='allowed-hosts-regex' id='allowed-hosts-regex' value='1'", (is_multisite() && is_plugin_active_for_network(plugin_basename(__FILE__))) ? checked(get_site_option('allowed-hosts-regex')) : checked(get_option('allowed-hosts-regex')), "/> <label for='allowed-hosts-regex'>Compare hosts using regular expressions</label>
+                            <p>Enter domain names that this WordPress instance needs to communicate with. Separate multiple domains by commas. Delimiters are not needed for regular expressions since they are put in for you ('/'). For information about regular expressions please go to <a href='http://www.regular-expressions.info'>http://www.regular-expressions.info</a>.</p>
+                        </td>
+                    </tr>
+                </table>";
+        submit_button();
+        echo "</form></div>";
     }
 
     public function register_settings() {
@@ -88,5 +158,8 @@ class AHSettings {
 
 }
 
+register_activation_hook( __FILE__, array('AH', 'activate'));
+register_deactivation_hook( __FILE__, array('AH', 'deactivate'));
+// add_action('init', create_function('', 'new AH();'));
 $ah = new AH();
 ?>
