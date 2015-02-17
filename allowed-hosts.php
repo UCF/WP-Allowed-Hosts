@@ -125,8 +125,16 @@ class AHSettings {
 		) {
 			// Remove slashes added by PHP or by WordPress
 			$allowed_hosts = ( !get_magic_quotes_gpc() && !function_exists( 'wp_magic_quotes' ) ) ? $_POST['allowed-hosts'] : stripslashes( $_POST['allowed-hosts'] );
-			update_site_option( AH::$ALLOWED_HOSTS_NAME, $allowed_hosts );
-			update_site_option( AH::$ALLOWED_HOSTS_REGEX_NAME, (int)$_POST['allowed-hosts-regex'] );
+			$allowed_hosts_regex = (int)$_POST['allowed-hosts-regex'];
+
+			// Update values.  Return whether or not the value in the db changed.
+			$allowed_hosts_changed = update_site_option( AH::$ALLOWED_HOSTS_NAME, $allowed_hosts );
+			$allowed_hosts_regex_changed = update_site_option( AH::$ALLOWED_HOSTS_REGEX_NAME, $allowed_hosts_regex );
+
+			// If the value in the db changed for any field, display a success message
+			if ( $allowed_hosts_changed || $allowed_hosts_regex_changed ) {
+				echo '<div class="updated"><p>' . __( 'Settings saved.' ) . '</p></div>';
+			}
 		}
 
 		$this->display_options_page();
