@@ -18,7 +18,7 @@ class AH {
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
 		$hook = ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) ? 'network_' : '';
-		add_action( '{$hook}admin_menu', create_function( '', 'new AHSettings();' ) );
+		add_action( "{$hook}admin_menu", create_function( '', 'new AHSettings();' ) );
 
 		add_filter( 'http_request_host_is_external', array( $this, 'http_external_host_allowed' ), 10, 2 );
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
@@ -160,10 +160,11 @@ class AHSettings {
                         <th scope="row">Hosts</th>
                         <td>
                             <textarea name="allowed-hosts"><?php echo $allowed_hosts; ?></textarea>
-                            <br>
+                            <br><br>
                             <input type="checkbox" name="allowed-hosts-regex" id="allowed-hosts-regex" value="1" <?php checked( $allowed_hosts_regex ); ?> />
                             <label for="allowed-hosts-regex">Compare hosts using regular expressions</label>
-                            <p>
+                            <br><br>
+                            <p class="description">
                             	Enter domain names that this WordPress instance needs to communicate with. Separate
                             	multiple domains by commas. Delimiters are not needed for regular expressions since
                             	they are put in for you ('/'). For information about regular expressions please go to
@@ -176,7 +177,7 @@ class AHSettings {
             </form>
         </div>
 	<?php
-		return ob_get_clean();
+		echo ob_get_clean();
 	}
 
 	public function register_settings() {
