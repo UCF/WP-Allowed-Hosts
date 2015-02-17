@@ -30,8 +30,8 @@ class AH {
 			add_site_option( AH::$ALLOWED_HOSTS_NAME, '' );
 			add_site_option( AH::$ALLOWED_HOSTS_REGEX_NAME, 0 );
 		} else {
-			delete_option( AH::$ALLOWED_HOSTS_NAME, '' );
-			delete_option( AH::$ALLOWED_HOSTS_REGEX_NAME, 0 );
+			add_option( AH::$ALLOWED_HOSTS_NAME, '' );
+			add_option( AH::$ALLOWED_HOSTS_REGEX_NAME, 0 );
 		}
 	}
 
