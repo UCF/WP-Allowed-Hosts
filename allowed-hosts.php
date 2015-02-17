@@ -146,7 +146,7 @@ class AHSettings {
 		} else {
 			$allowed_hosts = get_option( 'allowed-hosts' );
 			$allowed_hosts_regex = get_option( 'allowed-hosts-regex' );
-			$post_action = 'action=\"options.php\"';
+			$post_action = 'action="options.php"';
 		}
 
 		ob_start();
