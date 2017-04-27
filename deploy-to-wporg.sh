@@ -20,7 +20,7 @@ GITPATH="$CURRENTDIR" # this file should be in the base of your git repository
 # svn config
 TMP_PATH=`mktemp -d`
 SVNPATH="$TMP_PATH/$PLUGINSLUG" # path to a temp SVN repo. No trailing slash required and don't add trunk.
-#SVNURL="http://plugins.svn.wordpress.org/$PLUGINSLUG/" # Remote SVN repo on wordpress.org, with no trailing slash
+#SVNURL="https://plugins.svn.wordpress.org/$PLUGINSLUG/" # Remote SVN repo on wordpress.org, with no trailing slash
 SVNURL="https://svn.code.sf.net/p/testing-svn-sync-with-git/code/"
 COMMITMSG="Deploy to WordPress.org via Jenkins"
 
@@ -68,7 +68,8 @@ cd $SVNPATH/trunk/
 # Add all new files that are not set to be ignored
 echo "committing to trunk"
 set +x
-svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "$COMMITMSG"
+echo 'svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "$COMMITMSG"'
+echo `svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "$COMMITMSG"`
 set -x
 echo "Check if tagged version exists"
 cd $SVNPATH
@@ -77,7 +78,8 @@ if [ ! -d "$SVNPATH/tags/$NEWVERSION1/" ]; then
 	svn copy trunk/ tags/$NEWVERSION1/
 	cd $SVNPATH/tags/$NEWVERSION1
 	set +x
-	svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "Tagging version $NEWVERSION1"
+	echo 'svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "Tagging version $NEWVERSION1"'
+	echo `svn commit --username=$WP_ORG_USER --password=$WP_ORG_PASS -m "Tagging version $NEWVERSION1"`
 	set -x
 fi
 
