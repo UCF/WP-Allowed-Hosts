@@ -69,7 +69,7 @@ cd ${SVNPATH}/trunk/
 echo "committing to trunk"
 set +x
 echo 'svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m '\"$COMMITMSG\"
-printf `svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m "${COMMITMSG}"`
+echo "$(svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m "${COMMITMSG}")"
 set -x
 echo "Check if tagged version exists"
 cd ${SVNPATH}
@@ -79,7 +79,7 @@ if [ ! -d "${SVNPATH}/tags/${NEWVERSION1}/" ]; then
 	cd ${SVNPATH}/tags/${NEWVERSION1}
 	set +x
 	echo 'svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m '\"Tagging version ${NEWVERSION1}\"
-	printf `svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m "Tagging version ${NEWVERSION1}"`
+	echo "$(svn commit --username=${WP_ORG_USER} --password=${WP_ORG_PASS} -m "Tagging version ${NEWVERSION1}")"
 	set -x
 fi
 
