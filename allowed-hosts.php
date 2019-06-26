@@ -18,7 +18,7 @@ class AH {
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
 		$hook = ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) ? 'network_' : '';
-		add_action( "{$hook}admin_menu", create_function( '', 'new AHSettings();' ) );
+		add_action( "{$hook}admin_menu", function() { new AHSettings(); } );
 
 		add_filter( 'http_request_host_is_external', array( $this, 'http_external_host_allowed' ), 10, 2 );
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
