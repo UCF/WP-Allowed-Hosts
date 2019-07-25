@@ -1,9 +1,9 @@
 === WP Allowed Hosts ===
 Contributors: ucfwebcom
 Tags: host, hosts, allow, filter, multisite
-Requires at least: 3.7.1
-Tested up to: 3.7.1
-Stable tag: 1.0.6
+Requires at least: 3.7.0
+Tested up to: 5.2.2
+Stable tag: 1.0.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
 
@@ -28,6 +28,9 @@ The allowed hosts setting can be enabled at the Network level (multisite) or at 
 The setting is located under WP Admin's Setting > Allow Hosts. If you don't see it you are probably running a Network (multisite) version of wordpress and the plugin is enabled at the network level. Enabling at the Network level will take precedence.
 
 == Changelog ==
+
+= 1.0.7 =
+* Update to readme to reflect compatibility.
 
 = 1.0.6 =
 * Removed usage of `create_function()` for better compatibility with newer versions of PHP.
