@@ -1,0 +1,8 @@
+{
+    "name": "ucf/wp-allowed-hosts",
+    "description": "This plugin allows local domains to communicate.",
+    "type": "wordpress-plugin",
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
